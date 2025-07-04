@@ -18,4 +18,4 @@ else
     echo "TPM already installed."
 fi
 
-echo "Done. Now start tmux and press prefix + I to install plugins."
+echo "Done. Now start tmux and press Prefix + I to install plugins."

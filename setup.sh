@@ -2,7 +2,7 @@
 
 set -e
 
-CONFIG_DIR="%HOME/.config/tmux"
+CONFIG_DIR="$HOME/.config/tmux"
 TPM_DIR="$CONFIG_DIR/plugins/tpm"
 
 echo "Creating config directory..."

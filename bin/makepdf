@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Check args
+if [ $# -lt 1 ]; then
+    echo "Usage: makepdf source.md [output.pdf]"
+    exit 1
+fi
+
+input="$1"
+
+# If second argument is given, use it. Otherwise auto-generate .pdf
+if [ $# -ge 2 ]; then
+    output="$2"
+else
+    output="${input%.*}.pdf"
+fi
+
+flags="--pdf-engine=xelatex"
+
+pandoc "$flags" "$input" -o "$output"

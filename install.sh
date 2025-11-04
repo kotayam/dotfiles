@@ -14,6 +14,7 @@ install_fedora() {
 
 install_ubuntu() {
     echo "Installing packages for Ubuntu..."
+    sudo apt update
 
     echo "- Installing lazygit..."
     LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')

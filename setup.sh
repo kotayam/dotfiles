@@ -10,11 +10,13 @@ echo
 echo "Setting up neovim..."
 stow -R nvim
 echo "Neovim setup complete!"
+echo
 
 # setup lazygit
 echo "Setting up lazygit..."
 stow -R lazygit
 echo "Lazygit setup complete!"
+echo
 
 # setup tmux
 echo "Setting up tmux..."

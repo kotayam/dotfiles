@@ -24,7 +24,7 @@ install_ubuntu() {
 
     echo "- Installing neovim..."
     sudo apt remove -y neovim
-    curl -LO $HOME/nvim-linux-x86_64.appimage https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
+    curl -LO $HOME/nvim-linux-x86_64.appimage "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage"
     chmod u+x $HOME/nvim-linux-x86_64.appimage
     mkdir -p $HOME/.local/bin
     mv $HOME/nvim-linux-x86_64.appimage $HOME/.local/bin/nvim

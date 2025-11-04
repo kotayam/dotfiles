@@ -22,14 +22,15 @@ install_ubuntu() {
     tar xf $HOME/lazygit.tar.gz -C $HOME lazygit
     sudo install $HOME/lazygit -D -t /usr/local/bin/
 
-    echo "Removing old Neovim (if any) and stable PPA..."
-    sudo apt purge -y neovim
-    sudo add-apt-repository --remove ppa:neovim-ppa/stable -y
-    echo "Adding Neovim (unstable/nightly) PPA..."
-    sudo add-apt-repository ppa:neovim-ppa/unstable -y
+    echo "- Installing neovim..."
+    sudo apt remove -y neovim
+    curl -LO $HOME/nvim-linux-x86_64.appimage https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage
+    chmod u+x $HOME/nvim-linux-x86_64.appimage
+    mkdir -p $HOME/.local/bin
+    mv $HOME/nvim-linux-x86_64.appimage $HOME/.local/bin/nvim
 
     echo "- Installing rest of packages..."
-    sudo apt install -y stow tmux neovim
+    sudo apt install -y stow tmux
 }
 
 print_usage() {

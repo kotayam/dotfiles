@@ -22,6 +22,12 @@ install_ubuntu() {
     tar xf $HOME/lazygit.tar.gz -C $HOME lazygit
     sudo install $HOME/lazygit -D -t /usr/local/bin/
 
+    echo "Removing old Neovim (if any) and stable PPA..."
+    sudo apt purge -y neovim
+    sudo add-apt-repository --remove ppa:neovim-ppa/stable -y
+    echo "Adding Neovim (unstable/nightly) PPA..."
+    sudo add-apt-repository ppa:neovim-ppa/unstable -y
+
     echo "- Installing rest of packages..."
     sudo apt install -y stow tmux neovim
 }

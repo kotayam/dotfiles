@@ -66,6 +66,7 @@ return {
 			svelte = {},
 			openscad_lsp = {},
 			clangd = {},
+			neocmake = { cmd = { "neocmakelsp", "stdio" } },
 		}
 
 		-- Ensure these servers are installed
@@ -140,6 +141,10 @@ return {
 
 			if conf.filetypes then
 				opts.filetypes = conf.filetypes
+			end
+
+			if conf.cmd then
+				opts.cmd = conf.cmd
 			end
 
 			lspconfig[name].setup(opts)

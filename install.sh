@@ -24,10 +24,10 @@ install_ubuntu() {
 
     echo "- Installing neovim..."
     sudo apt remove -y neovim
-    curl -Lo $HOME/nvim-linux-x86_64.appimage "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.appimage"
-    chmod u+x $HOME/nvim-linux-x86_64.appimage
+    curl -Lo $HOME/nvim-linux-x86_64.tar.gz https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+    sudo tar -xzf $HOME/nvim-linux-x86_64.tar.gz -C $HOME
     mkdir -p $HOME/.local/bin
-    mv $HOME/nvim-linux-x86_64.appimage $HOME/.local/bin/nvim
+    ln -sf $HOME/nvim-linux-x86_64/bin/nvim $HOME/.local/bin/nvim
 
     echo "- Installing rest of packages..."
     sudo apt install -y stow tmux

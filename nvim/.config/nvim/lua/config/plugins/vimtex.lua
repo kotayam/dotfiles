@@ -1,5 +1,6 @@
 return {
 	"lervag/vimtex",
+	version = "v2.18",
 	ft = { "tex", "plaintex", "bib" },
 	init = function()
 		vim.g.vimtex_view_method = "zathura"

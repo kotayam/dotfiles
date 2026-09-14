@@ -22,7 +22,6 @@ return {
 	config = function()
 		require("mason").setup()
 		local mason_lspconfig = require("mason-lspconfig")
-		local lspconfig = require("lspconfig")
 
 		-- lsp servers with options
 		local lsp_servers = {
@@ -67,6 +66,7 @@ return {
 			openscad_lsp = {},
 			clangd = {},
 			neocmake = { cmd = { "neocmakelsp", "stdio" } },
+			texlab = {},
 		}
 
 		-- Ensure these servers are installed
@@ -136,7 +136,7 @@ return {
 			local opts = { on_attach = on_attach }
 
 			if conf.settings then
-				opts.settings = conf.settings
+				opts.settings = type(conf.settings) == "function" and conf.settings() or conf.settings
 			end
 
 			if conf.filetypes then
@@ -147,7 +147,8 @@ return {
 				opts.cmd = conf.cmd
 			end
 
-			lspconfig[name].setup(opts)
+			vim.lsp.config(name, opts)
+			vim.lsp.enable(name)
 		end
 	end,
 }

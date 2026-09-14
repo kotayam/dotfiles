@@ -25,6 +25,8 @@ return {
 				"bash",
 				"cpp",
 				"cmake",
+				"latex",
+				"bibtex",
 			},
 			sync_install = false,
 			auto_install = true,

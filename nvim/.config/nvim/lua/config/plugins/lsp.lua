@@ -67,6 +67,7 @@ return {
 			openscad_lsp = {},
 			clangd = {},
 			neocmake = { cmd = { "neocmakelsp", "stdio" } },
+			texlab = {},
 		}
 
 		-- Ensure these servers are installed

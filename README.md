@@ -21,6 +21,7 @@ sudo chmod +x ./install.sh
 ## Setup
 
 Setup the dotfiles by running `setup.sh`.
+This configures Bash aliases, Neovim, Lazygit, and tmux.
 
 ```bash
 sudo chmod +x ./setup.sh

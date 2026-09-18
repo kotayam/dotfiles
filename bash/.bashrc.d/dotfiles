@@ -1,0 +1,11 @@
+# Navigation
+alias ..='cd ..'
+alias ...='cd ../..'
+
+# Directory listings
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+# Codex
+alias cr='codex resume'

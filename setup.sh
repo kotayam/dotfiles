@@ -6,6 +6,12 @@ echo "Starting dotfiles setup..."
 echo "This will create symlinks in your home directory"
 echo 
 
+# setup bash aliases
+echo "Setting up Bash aliases..."
+stow -R bash
+echo "Bash aliases setup complete!"
+echo
+
 # setup neovim
 echo "Setting up neovim..."
 stow -R nvim

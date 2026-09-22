@@ -9,3 +9,14 @@ alias l='ls -CF'
 
 # Codex
 alias cr='codex resume'
+
+# Git
+alias gl='git log'
+alias glo='git log --oneline'
+alias gr='git rebase'
+alias gps='git push'
+alias gpl='git pull'
+alias gf='git fetch'
+
+# Source .bashrc
+alias srcb='source ~/.bashrc'

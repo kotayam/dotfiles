@@ -2,6 +2,10 @@
 
 let mapleader = " "
 
+" Enable syntax highlighting and filetype-specific settings.
+syntax enable
+filetype plugin indent on
+
 " Exit insert mode with kj.
 inoremap kj <Esc>
 

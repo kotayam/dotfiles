@@ -1,6 +1,7 @@
 # Vim Config
 
 Basic Vim key mappings mirrored from the Neovim configuration.
+Syntax highlighting and filetype-specific plugins and indentation are enabled.
 
 ## Installation
 

@@ -18,6 +18,12 @@ stow -R nvim
 echo "Neovim setup complete!"
 echo
 
+# setup vim
+echo "Setting up Vim..."
+stow -R vim
+echo "Vim setup complete!"
+echo
+
 # setup lazygit
 echo "Setting up lazygit..."
 stow -R lazygit

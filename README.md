@@ -7,6 +7,7 @@ My personal dotfiles.
 Install the following applications.
 
 - `stow`
+- `vim`
 - `neovim`
 - `tmux`
 - `lazygit`
@@ -21,7 +22,7 @@ sudo chmod +x ./install.sh
 ## Setup
 
 Setup the dotfiles by running `setup.sh`.
-This configures Bash aliases, Neovim, Lazygit, and tmux.
+This configures Bash aliases, Vim, Neovim, Lazygit, and tmux.
 
 ```bash
 sudo chmod +x ./setup.sh

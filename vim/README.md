@@ -3,6 +3,7 @@
 Basic Vim key mappings mirrored from the Neovim configuration.
 Syntax highlighting and filetype-specific plugins and indentation are enabled.
 Vim uses its built-in dark `habamax` colorscheme.
+The current line uses an absolute number, while other lines use relative numbers.
 
 ## Installation
 

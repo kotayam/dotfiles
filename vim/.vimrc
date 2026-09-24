@@ -7,6 +7,8 @@ syntax enable
 filetype plugin indent on
 set background=dark
 colorscheme habamax
+set number
+set relativenumber
 
 " Exit insert mode with kj.
 inoremap kj <Esc>

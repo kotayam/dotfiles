@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+    cat <<'EOF'
+Usage: mergepdf INPUT.pdf INPUT2.pdf [INPUT.pdf ...] [-o OUTPUT.pdf]
+
+Merge two or more PDFs. Writes merged.pdf when -o is not provided.
+EOF
+}
+
+fail() {
+    echo "mergepdf: $*" >&2
+    exit 1
+}
+
+if ! command -v pdfunite >/dev/null 2>&1; then
+    fail "pdfunite is required but was not found in PATH"
+fi
+
+output="merged.pdf"
+inputs=()
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        -o)
+            [ "$#" -ge 2 ] || fail "-o requires an output path"
+            output="$2"
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --)
+            shift
+            inputs+=("$@")
+            break
+            ;;
+        -*)
+            fail "unknown option: $1"
+            ;;
+        *)
+            inputs+=("$1")
+            shift
+            ;;
+    esac
+done
+
+[ "${#inputs[@]}" -ge 2 ] || {
+    usage >&2
+    fail "at least two input PDFs are required"
+}
+
+for input in "${inputs[@]}"; do
+    [ -f "$input" ] && [ -r "$input" ] || fail "input is not a readable file: $input"
+done
+
+if [ -e "$output" ] || [ -L "$output" ]; then
+    fail "output already exists: $output"
+fi
+
+output_dir=$(dirname -- "$output")
+output_base=$(basename -- "$output")
+[ -d "$output_dir" ] || fail "output directory does not exist: $output_dir"
+[ -w "$output_dir" ] || fail "output directory is not writable: $output_dir"
+
+temporary_output=$(mktemp "$output_dir/.${output_base}.XXXXXX.pdf")
+
+cleanup() {
+    [ -z "${temporary_output:-}" ] || rm -f -- "$temporary_output"
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+pdfunite "${inputs[@]}" "$temporary_output"
+
+# A hard link is created atomically and fails if the target appeared meanwhile.
+if ! ln -- "$temporary_output" "$output"; then
+    fail "could not create output without overwriting it: $output"
+fi
+
+rm -f -- "$temporary_output"
+temporary_output=""

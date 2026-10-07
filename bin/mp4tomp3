@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+    cat <<'EOF'
+Usage: mp4tomp3 INPUT.mp4 [-o OUTPUT.mp3]
+
+Extract the first audio stream as a high-quality variable-bitrate MP3.
+Defaults to the input's directory and basename with an .mp3 extension.
+Requires ffmpeg with the libmp3lame encoder. Existing files are never overwritten.
+Use -- before an input path that starts with a dash.
+EOF
+}
+
+fail() {
+    echo "mp4tomp3: $*" >&2
+    exit 1
+}
+
+output=""
+inputs=()
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        -o)
+            [ "$#" -ge 2 ] && [ -n "$2" ] || fail "-o requires an output path"
+            output="$2"
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --)
+            shift
+            inputs+=("$@")
+            break
+            ;;
+        -*)
+            fail "unknown option: $1"
+            ;;
+        *)
+            inputs+=("$1")
+            shift
+            ;;
+    esac
+done
+
+[ "${#inputs[@]}" -eq 1 ] || {
+    usage >&2
+    fail "exactly one input file is required"
+}
+
+command -v ffmpeg >/dev/null 2>&1 || fail "ffmpeg is required but was not found in PATH"
+
+input="${inputs[0]}"
+[ -f "$input" ] && [ -r "$input" ] || fail "input is not a readable file: $input"
+
+# Prefix relative paths so FFmpeg treats them as files, including names with colons.
+case "$input" in
+    /*) ;;
+    *) input="./$input" ;;
+esac
+
+if [ -z "$output" ]; then
+    input_dir=$(dirname -- "$input")
+    input_base=$(basename -- "$input")
+    output="$input_dir/${input_base%.*}.mp3"
+fi
+case "$output" in
+    /*) ;;
+    *) output="./$output" ;;
+esac
+
+if [ -e "$output" ] || [ -L "$output" ]; then
+    fail "output already exists: $output"
+fi
+
+output_dir=$(dirname -- "$output")
+output_base=$(basename -- "$output")
+[ -d "$output_dir" ] || fail "output directory does not exist: $output_dir"
+[ -w "$output_dir" ] || fail "output directory is not writable: $output_dir"
+
+temporary_output=$(mktemp "$output_dir/.${output_base}.XXXXXX.mp3")
+cleanup() {
+    [ -z "${temporary_output:-}" ] || rm -f -- "$temporary_output"
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+if ! ffmpeg -hide_banner -loglevel error -nostdin -y -i "$input" \
+    -map 0:a:0 -vn -c:a libmp3lame -q:a 2 -f mp3 "$temporary_output"; then
+    fail "conversion failed: $input"
+fi
+
+# Publish atomically, refusing to overwrite a destination created meanwhile.
+if ! ln -T -- "$temporary_output" "$output"; then
+    fail "could not create output without overwriting it: $output"
+fi
+
+rm -f -- "$temporary_output"
+temporary_output=""
+printf 'Created %s\n' "$output"

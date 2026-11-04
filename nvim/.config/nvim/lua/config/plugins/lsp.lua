@@ -65,6 +65,8 @@ return {
 			svelte = {},
 			openscad_lsp = {},
 			clangd = {},
+			pyright = {},
+			ruff = {},
 			neocmake = { cmd = { "neocmakelsp", "stdio" } },
 			texlab = {},
 		}
@@ -98,6 +100,11 @@ return {
 
 		-- on attach function
 		local on_attach = function(client, bufnr)
+			-- Use Pyright for Python documentation while Ruff handles linting and formatting.
+			if client.name == "ruff" then
+				client.server_capabilities.hoverProvider = false
+			end
+
 			if client.supports_method("textDocument/formatting") then
 				vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
 				vim.api.nvim_create_autocmd("BufWritePre", {

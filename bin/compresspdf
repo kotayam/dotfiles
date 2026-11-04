@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+    cat <<'HELP'
+Usage: compresspdf INPUT.pdf [-o OUTPUT.pdf] [-q PRESET]
+
+Compress one PDF using Ghostscript (gs).
+Defaults to INPUT-compressed.pdf beside the input.
+Presets: ebook (default), screen (smaller), printer, prepress (higher quality).
+Compression may reduce image quality and may not shrink every PDF.
+Existing files are never overwritten. The source is preserved.
+Use -- before an input path that starts with a dash.
+HELP
+}
+
+fail() {
+    echo "compresspdf: $*" >&2
+    exit 1
+}
+
+output=""
+preset="ebook"
+inputs=()
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        -o|-q)
+            [ "$#" -ge 2 ] && [ -n "$2" ] || fail "$1 requires a value"
+            if [ "$1" = -o ]; then output="$2"; else preset="$2"; fi
+            shift 2
+            ;;
+        -h|--help) usage; exit 0 ;;
+        --) shift; inputs+=("$@"); break ;;
+        -*) fail "unknown option: $1" ;;
+        *) inputs+=("$1"); shift ;;
+    esac
+done
+
+[ "${#inputs[@]}" -eq 1 ] || { usage >&2; fail "exactly one input file is required"; }
+case "$preset" in
+    ebook|screen|printer|prepress) ;;
+    *) fail "invalid preset: $preset" ;;
+esac
+command -v gs >/dev/null 2>&1 || fail "Ghostscript (gs) is required but was not found in PATH"
+input="${inputs[0]}"
+[ -f "$input" ] && [ -r "$input" ] || fail "input is not a readable file: $input"
+case "$input" in /*) ;; *) input="./$input" ;; esac
+if [ -z "$output" ]; then
+    input_dir=$(dirname -- "$input")
+    input_base=$(basename -- "$input")
+    output="$input_dir/${input_base%.*}-compressed.pdf"
+fi
+case "$output" in /*) ;; *) output="./$output" ;; esac
+[ ! -e "$output" ] && [ ! -L "$output" ] || fail "output already exists: $output"
+output_dir=$(dirname -- "$output")
+output_base=$(basename -- "$output")
+[ -d "$output_dir" ] && [ -w "$output_dir" ] || fail "output directory is missing or not writable: $output_dir"
+original_size=$(wc -c < "$input")
+temporary_output=$(mktemp "$output_dir/.${output_base}.XXXXXX.pdf")
+cleanup() {
+    [ -z "${temporary_output:-}" ] || rm -f -- "$temporary_output"
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+if ! gs -q -dSAFER -dBATCH -dNOPAUSE -sDEVICE=pdfwrite "-dPDFSETTINGS=/$preset" "-sOutputFile=$temporary_output" -f "$input"; then
+    fail "compression failed: $input"
+fi
+result_size=$(wc -c < "$temporary_output")
+# Publish atomically without replacing an existing destination.
+ln -T -- "$temporary_output" "$output" || fail "could not create output without overwriting it: $output"
+rm -f -- "$temporary_output"
+temporary_output=""
+printf 'Created %s (%s -> %s bytes)\n' "$output" "$original_size" "$result_size"
